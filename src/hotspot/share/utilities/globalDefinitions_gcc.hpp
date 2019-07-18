@@ -215,6 +215,12 @@ inline int g_isnan(double f) { return isnan(f); }
 #define CAN_USE_NAN_DEFINE 1
 #endif
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#else
+#define TARGET_OS_IPHONE 0
+#endif
+
 
 // Checking for finiteness
 

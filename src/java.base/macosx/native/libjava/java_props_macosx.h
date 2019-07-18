@@ -24,6 +24,11 @@
  */
 
 #include "java_props.h"
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#else
+#define TAGET_OS_IPHONE 0
+#endif
 
 char *setupMacOSXLocale(int cat);
 const char *convertToPOSIXLocale(const char* src);
