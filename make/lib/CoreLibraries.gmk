@@ -78,6 +78,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBVERIFY, \
     NAME := verify, \
     OPTIMIZATION := $(LIBVERIFY_OPTIMIZATION), \
     CFLAGS := $(CFLAGS_JDKLIB), \
+    CFLAGS_ios := -I$(TOPDIR)/src/java.base/macosx/native/libjli, \
     LDFLAGS := $(LDFLAGS_JDKLIB) \
         $(call SET_SHARED_LIBRARY_ORIGIN), \
     LIBS_unix := -ljvm, \
