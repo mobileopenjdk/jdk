@@ -40,15 +40,12 @@
 #include "manifest_info.h"
 
 #ifdef __APPLE__
-#include <TargetConditionals.h>
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
 /* Support Cocoa event loop on the main thread */
 #include <Cocoa/Cocoa.h>
 #include <objc/objc-runtime.h>
 #include <objc/objc-auto.h>
 #endif
-#else
-#define TARGET_IOS_IPHONE 0
 #endif
 
 #include <errno.h>
@@ -316,7 +313,7 @@ static void *apple_main (void *arg)
     exit(main_fptr(args->argc, args->argv));
 }
 
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
 static void dummyTimer(CFRunLoopTimerRef timer, void *info) {}
 
 static void ParkEventLoop() {
@@ -362,7 +359,7 @@ static void MacOSXStartup(int argc, char *argv[]) {
         exit(1);
     }
 
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
     ParkEventLoop();
 #endif
 }
@@ -905,7 +902,7 @@ int
 JVMInit(InvocationFunctions* ifn, jlong threadStackSize,
                  int argc, char **argv,
                  int mode, char *what, int ret) {
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
     if (sameThread) {
         JLI_TraceLauncher("In same thread\n");
         // need to block this thread against the main thread

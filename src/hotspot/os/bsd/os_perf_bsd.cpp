@@ -29,7 +29,7 @@
 #include "vm_version_ext_x86.hpp"
 
 #ifdef __APPLE__
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
   #import <libproc.h>
 #endif
   #include <sys/time.h>
@@ -39,7 +39,7 @@
   #include <sys/socket.h>
   #include <net/if.h>
   #include <net/if_dl.h>
-#if ! TARGET_OS_IPHONE
+#ifndef TARGET_IOS
   #include <net/route.h>
 #else
   #define RTM_IFINFO2 0x12
@@ -290,7 +290,8 @@ SystemProcessInterface::SystemProcesses::~SystemProcesses() {
 int SystemProcessInterface::SystemProcesses::system_processes(SystemProcess** system_processes, int* no_of_sys_processes) const {
   assert(system_processes != NULL, "system_processes pointer is NULL!");
   assert(no_of_sys_processes != NULL, "system_processes counter pointer is NULL!");
-#if defined(__APPLE__) && ! TARGET_OS_IPHONE
+#ifdef __APPLE__
+#ifndef TARGET_IOS
   pid_t* pids = NULL;
   int pid_count = 0;
   ResourceMark rm;
@@ -347,6 +348,7 @@ int SystemProcessInterface::SystemProcesses::system_processes(SystemProcess** sy
   *system_processes = next;
 
   return OS_OK;
+#endif
 #endif
   return FUNCTIONALITY_NOT_IMPLEMENTED;
 }

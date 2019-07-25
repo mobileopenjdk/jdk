@@ -29,8 +29,7 @@
 #include <sys/types.h>
 
 #ifdef __APPLE__
-#include <TargetConditionals.h>
-#ifdef TARGET_OS_IPHONE
+#ifdef TARGET_IOS
 extern char **environ;
 #else
 #include <crt_externs.h>
