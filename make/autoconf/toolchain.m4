@@ -251,6 +251,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_DETERMINE_TOOLCHAIN_TYPE],
       # default to clang
       DEFAULT_TOOLCHAIN="clang"
     fi
+  elif test "x$OPENJDK_TARGET_OS" = "xandroid"  ; then
+          DEFAULT_TOOLCHAIN="clang"
   else
     # First toolchain type in the list is the default
     DEFAULT_TOOLCHAIN=${VALID_TOOLCHAINS%% *}
@@ -533,6 +535,7 @@ AC_DEFUN([TOOLCHAIN_FIND_COMPILER],
 [
   COMPILER_NAME=$2
   SEARCH_LIST="$3"
+    AC_MSG_NOTICE([OOOOOOOOOOOOOOOOOOOOOOOO 1 = $1   and 2 = $2    and 3 = $3])
 
   if test "x[$]$1" != x; then
     # User has supplied compiler name already, always let that override.
