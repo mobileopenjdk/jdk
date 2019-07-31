@@ -74,7 +74,11 @@
 # include <pwd.h>
 # include <poll.h>
 # include <ucontext.h>
+#ifdef __ANDROID__
+# include <asm/sigcontext.h>
+#else
 # include <fpu_control.h>
+#endif
 
 #define REG_FP 29
 #define REG_LR 30

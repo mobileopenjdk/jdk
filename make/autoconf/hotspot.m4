@@ -190,6 +190,12 @@ AC_DEFUN_ONCE([HOTSPOT_SETUP_DTRACE],
     if test "x$DTRACE_DEP_MISSING" = "xtrue"; then
       INCLUDE_DTRACE=false
       AC_MSG_RESULT([no, missing dependencies])
+    elif test "x$OPENJDK_TARGET_OS" = "xios" ; then
+      INCLUDE_DTRACE=false
+      AC_MSG_RESULT([no, ios build])
+    elif test "x$OPENJDK_TARGET_OS" = "xandroid" ; then
+      INCLUDE_DTRACE=false
+      AC_MSG_RESULT([no, android build])
     else
       INCLUDE_DTRACE=true
       AC_MSG_RESULT([yes, dependencies present])
@@ -542,6 +548,10 @@ AC_DEFUN_ONCE([HOTSPOT_SETUP_JVM_FEATURES],
   JVM_FEATURES_minimal="compiler1 minimal serialgc $JVM_FEATURES $JVM_FEATURES_link_time_opt"
   JVM_FEATURES_zero="zero $NON_MINIMAL_FEATURES $JVM_FEATURES"
   JVM_FEATURES_custom="$JVM_FEATURES"
+
+  if test "x$OPENJDK_TARGET_OS" = "xios" || test "x$OPENJDK_TARGET_OS" = "xandroid"; then
+    JVM_FEATURES_minimal="$JVM_FEATURES_minimal jvmti"
+  fi
 
   AC_SUBST(JVM_FEATURES_server)
   AC_SUBST(JVM_FEATURES_client)

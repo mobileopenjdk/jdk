@@ -117,6 +117,10 @@ AC_DEFUN([FLAGS_SETUP_DEBUG_SYMBOLS],
   elif test "x$TOOLCHAIN_TYPE" = xclang; then
     CFLAGS_DEBUG_SYMBOLS="-g"
     ASFLAGS_DEBUG_SYMBOLS="-g"
+    if test "x$OPENJDK_TARGET_OS" = xandroid; then
+      CFLAGS_DEBUG_SYMBOLS="-target aarch64-linux-android24 -g"
+      ASFLAGS_DEBUG_SYMBOLS="-target aarch64-linux-android24 -g"
+    fi
   elif test "x$TOOLCHAIN_TYPE" = xsolstudio; then
     # -g0 enables debug symbols without disabling inlining.
     CFLAGS_DEBUG_SYMBOLS="-g0 -xs"
@@ -454,8 +458,8 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
     CFLAGS_OS_DEF_JVM="-DMACOSX -D_ALLBSD_SOURCE -DTARGET_IOS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE"
     CFLAGS_OS_DEF_JDK="-DMACOSX -D_ALLBSD_SOURCE -DTARGET_IOS -D_DARWIN_UNLIMITED_SELECT"
   elif test "x$OPENJDK_TARGET_OS" = xandroid; then
-    CFLAGS_OS_DEF_JVM="-DLINUX"
-    CFLAGS_OS_DEF_JDK="-DLINUX"
+    CFLAGS_OS_DEF_JVM="-target aarch64-linux-android24 -DLINUX"
+    CFLAGS_OS_DEF_JDK="-target aarch64-linux-android24 -DLINUX"
   elif test "x$OPENJDK_TARGET_OS" = xaix; then
     CFLAGS_OS_DEF_JVM="-DAIX"
   elif test "x$OPENJDK_TARGET_OS" = xbsd; then
