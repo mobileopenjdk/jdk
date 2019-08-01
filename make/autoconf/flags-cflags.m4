@@ -461,7 +461,7 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
     # CFLAGS_OS_DEF_JVM="-target aarch64-linux-android24 -DLINUX -D__USE_GNU"
     # CFLAGS_OS_DEF_JDK="-target aarch64-linux-android24 -DLINUX -D__USE_GNU"
     CFLAGS_OS_DEF_JVM="-target aarch64-linux-android24 -DLINUX"
-    CFLAGS_OS_DEF_JDK="-target aarch64-linux-android24 -DLINUX"
+    CFLAGS_OS_DEF_JDK="-target aarch64-linux-android24 -D_GNU_SOURCE -DLINUX"
   elif test "x$OPENJDK_TARGET_OS" = xaix; then
     CFLAGS_OS_DEF_JVM="-DAIX"
   elif test "x$OPENJDK_TARGET_OS" = xbsd; then

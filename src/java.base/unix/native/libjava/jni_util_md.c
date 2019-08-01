@@ -30,13 +30,11 @@
 #include "jni_util.h"
 #include "dlfcn.h"
 
-#ifndef __ANDROID__
 #if defined(LINUX) && (defined(_GNU_SOURCE) || \
          (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE < 200112L \
              && defined(_XOPEN_SOURCE) && _XOPEN_SOURCE < 600))
 extern int __xpg_strerror_r(int, char *, size_t);
 #define strerror_r(a, b, c) __xpg_strerror_r((a), (b), (c))
-#endif
 #endif
 
 void* getProcessHandle() {

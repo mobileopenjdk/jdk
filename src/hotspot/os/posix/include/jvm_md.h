@@ -25,7 +25,6 @@
 
 #ifndef _JAVASOFT_JVM_MD_H_
 #define _JAVASOFT_JVM_MD_H_
-
 /*
  * This file is currently collecting system-specific dregs for the
  * JNI conversion, which should be sorted out later.
