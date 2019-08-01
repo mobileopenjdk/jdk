@@ -26,6 +26,10 @@
 #ifndef JDK_UTIL_MD_H
 #define JDK_UTIL_MD_H
 
+#ifdef __ANDROID__
+#define __USE_GNU 1
+#endif
+
 // checking for nanness
 #ifdef __solaris__
 #include <ieeefp.h>

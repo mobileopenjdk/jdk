@@ -39,6 +39,9 @@
 #include "java_net_SocketOptions.h"
 
 #ifdef __linux__
+#ifdef __ANDROID__
+#include <netinet/in6.h>
+#endif
 #define IPV6_MULTICAST_IF 17
 #ifndef SO_BSDCOMPAT
 #define SO_BSDCOMPAT  14

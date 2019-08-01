@@ -24,6 +24,11 @@
  */
 #include "java.h"
 
+#ifdef __ANDROID__
+// we don't define this system wide as strerror_r would give issues
+#define __USE_GNU 1
+#endif
+
 /*
  * Find the last occurrence of a string
  */

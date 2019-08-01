@@ -33,7 +33,9 @@
 #error "The macro ARCHPROPNAME has not been defined"
 #endif
 #include <sys/utsname.h>        /* For os_name and os_version */
+#ifndef __ANDROID__
 #include <langinfo.h>           /* For nl_langinfo */
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -59,7 +61,11 @@
 #if !defined(_ALLBSD_SOURCE)
 #ifdef __linux__
   #ifndef CODESET
-  #define CODESET _NL_CTYPE_CODESET_NAME
+    #ifdef __ANDROID__
+      #define CODESET "xxx"
+    #else
+      #define CODESET _NL_CTYPE_CODESET_NAME
+    #endif
   #endif
 #else
 #ifdef ALT_CODESET_KEY
@@ -276,8 +282,11 @@ static int ParseLocale(JNIEnv* env, int cat, char ** std_language, char ** std_s
         if (strcmp(p, "ISO8859-15") == 0)
             p = "ISO8859-15";
         else
+#ifdef __ANDROID__
+            p = "UTF-8";
+#else
             p = nl_langinfo(CODESET);
-
+#endif
         /* Convert the bare "646" used on Solaris to a proper IANA name */
         if (strcmp(p, "646") == 0)
             p = "ISO646-US";
@@ -421,7 +430,11 @@ GetJavaProperties(JNIEnv *env)
 #else
         struct utsname name;
         uname(&name);
+#ifdef __ANDROID__
+        sprops.os_name = strdup("Android");
+#else
         sprops.os_name = strdup(name.sysname);
+#endif
 #ifdef _AIX
         {
             char *os_version = malloc(strlen(name.version) +

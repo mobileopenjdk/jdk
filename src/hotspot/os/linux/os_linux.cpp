@@ -113,6 +113,9 @@
 # include <sys/shm.h>
 # include <linux/elf.h>
 # include <linux/elf-em.h>
+#ifndef EM_ARM
+#define EM_ARM 40
+#endif
 #endif
 # include <stdint.h>
 # include <inttypes.h>

@@ -104,6 +104,9 @@ AC_DEFUN([FLAGS_SETUP_LDFLAGS_HELPER],
       BASIC_LDFLAGS="$BASIC_LDFLAGS -Wl,-z,noexecstack"
     fi
   fi
+  if test "x$OPENJDK_TARGET_OS" = xandroid; then
+    BASIC_LDFLAGS="$BASIC_LDFLAGS -target aarch64-linux-android24"
+  fi
 
   # Setup OS-dependent LDFLAGS
   if test "x$TOOLCHAIN_TYPE" = xclang || test "x$TOOLCHAIN_TYPE" = xgcc; then

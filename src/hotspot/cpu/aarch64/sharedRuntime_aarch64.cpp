@@ -46,6 +46,9 @@
 #include "adfiles/ad_aarch64.hpp"
 #include "opto/runtime.hpp"
 #endif
+#ifdef __ANDROID__
+#include "code/nativeInst.hpp"
+#endif
 #if INCLUDE_JVMCI
 #include "jvmci/jvmciJavaClasses.hpp"
 #endif
