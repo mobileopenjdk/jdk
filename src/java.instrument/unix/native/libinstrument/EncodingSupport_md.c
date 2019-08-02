@@ -28,8 +28,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <locale.h>
+#ifndef __ANDROID__
 #include <langinfo.h>
 #include <iconv.h>
+#endif
 
 /* Routines to convert back and forth between Platform Encoding and UTF-8 */
 
@@ -44,8 +46,10 @@
 #define UTF_DEBUG(x)
 
 /* Global variables */
+#ifndef __ANDROID__
 static iconv_t iconvToPlatform          = (iconv_t)-1;
 static iconv_t iconvFromPlatform        = (iconv_t)-1;
+#endif
 
 /*
  * Error handler
@@ -64,7 +68,7 @@ static void
 utfInitialize(void)
 {
     const char* codeset;
-
+#ifndef __ANDROID__
     /* Set the locale from the environment */
     (void)setlocale(LC_ALL, "");
 
@@ -106,6 +110,9 @@ utfInitialize(void)
     if ( iconvFromPlatform == (iconv_t)-1 ) {
         UTF_ERROR("Failed to complete iconv_open() setup");
     }
+#else
+    (void)codeset;
+#endif
 }
 
 /*
@@ -114,6 +121,7 @@ utfInitialize(void)
 static void
 utfTerminate(void)
 {
+#ifndef __ANDROID__
     if ( iconvFromPlatform!=(iconv_t)-1 ) {
         (void)iconv_close(iconvFromPlatform);
     }
@@ -122,12 +130,14 @@ utfTerminate(void)
     }
     iconvToPlatform   = (iconv_t)-1;
     iconvFromPlatform = (iconv_t)-1;
+#endif
 }
 
 /*
  * Do iconv() conversion.
  *    Returns length or -1 if output overflows.
  */
+#ifndef __ANDROID__
 static int
 iconvConvert(iconv_t ic, char *bytes, int len, char *output, int outputMaxLen)
 {
@@ -170,6 +180,7 @@ iconvConvert(iconv_t ic, char *bytes, int len, char *output, int outputMaxLen)
     output[len] = 0;
     return outputLen;
 }
+#endif
 
 /*
  * Convert UTF-8 to Platform Encoding.
@@ -178,7 +189,12 @@ iconvConvert(iconv_t ic, char *bytes, int len, char *output, int outputMaxLen)
 static int
 utf8ToPlatform(char *utf8, int len, char *output, int outputMaxLen)
 {
+#ifndef __ANDROID__
     return iconvConvert(iconvToPlatform, utf8, len, output, outputMaxLen);
+#else
+    strncpy(output, (char *)utf8, outputMaxLen - 1);
+    return strlen(output);
+#endif
 }
 
 /*
@@ -188,13 +204,20 @@ utf8ToPlatform(char *utf8, int len, char *output, int outputMaxLen)
 static int
 platformToUtf8(char *str, int len, char *output, int outputMaxLen)
 {
+#ifndef __ANDROID__
     return iconvConvert(iconvFromPlatform, str, len, output, outputMaxLen);
+#else
+    strncpy((char *)output, str, outputMaxLen - 1);
+    return strlen((char*)output);
+#endif
 }
 
 int
 convertUft8ToPlatformString(char* utf8_str, int utf8_len, char* platform_str, int platform_len) {
+#ifndef __ANDROID__
     if (iconvToPlatform ==  (iconv_t)-1) {
         utfInitialize();
     }
+#endif
     return utf8ToPlatform(utf8_str, utf8_len, platform_str, platform_len);
 }
