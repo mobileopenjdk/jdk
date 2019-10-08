@@ -31,6 +31,12 @@ $(eval $(call IncludeCustomExtension, hotspot/lib/JvmFlags.gmk))
 # This variable may be added to by a custom extension
 JVM_SRC_ROOTS += $(TOPDIR)/src/hotspot
 
+ifeq ($(OPENJDK_TARGET_OS), android)
+ JVM_CFLAGS_TARGET_DEFINES += -DLINUX -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+ HOTSPOT_TARGET_OS := linux
+endif
+
+
 JVM_SRC_DIRS += $(call uniq, $(wildcard $(foreach d, $(JVM_SRC_ROOTS), \
         $d/share \
         $d/os/$(HOTSPOT_TARGET_OS) \

@@ -30,7 +30,11 @@
 #if defined(__OpenBSD__)
 #include <sys/exec_elf.h>
 #else
+#ifdef __ANDROID__
+#include <linux/elf.h>
+#else
 #include <elf.h>
+#endif
 #endif
 #include <stdio.h>
 
@@ -46,7 +50,7 @@ typedef Elf64_Shdr      Elf_Shdr;
 typedef Elf64_Phdr      Elf_Phdr;
 typedef Elf64_Sym       Elf_Sym;
 
-#if !defined(_ALLBSD_SOURCE) || defined(__APPLE__)
+#if (!defined(_ALLBSD_SOURCE) && !defined(__ANDROID__)) || defined(__APPLE__)
 #define ELF_ST_TYPE ELF64_ST_TYPE
 #endif
 
@@ -62,7 +66,7 @@ typedef Elf32_Shdr      Elf_Shdr;
 typedef Elf32_Phdr      Elf_Phdr;
 typedef Elf32_Sym       Elf_Sym;
 
-#if !defined(_ALLBSD_SOURCE) || defined(__APPLE__)
+#if (!defined(_ALLBSD_SOURCE) && !defined(__ANDROID__)) || defined(__APPLE__)
 #define ELF_ST_TYPE ELF32_ST_TYPE
 #endif
 #endif

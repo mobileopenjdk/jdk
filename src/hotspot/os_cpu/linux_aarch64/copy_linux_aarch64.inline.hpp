@@ -113,7 +113,7 @@ static void pd_disjoint_words(const HeapWord* from, HeapWord* to, size_t count) 
     memcpy(to, from, count * sizeof(HeapWord));
     return;
   }
-  __asm volatile( "prfm pldl1strm, [%[s], #0];" :: [s]"r"(from) : "memory");
+  // __asm volatile( "prfm pldl1strm, [%[s], #0];" :: [s]"r"(from) : "memory");
   if (__builtin_expect(count <= 8, 1)) {
     COPY_SMALL(from, to, count);
     return;

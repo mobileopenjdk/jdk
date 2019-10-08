@@ -162,6 +162,7 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
     char *jvmtype;
     int i = 0;
     char** argv = *pargv;
+fprintf(stderr, "CREATE EXECUTION ENV\n");
 
     /* Find out where the JRE is that we will be using. */
     if (!GetJREPath(jrepath, so_jrepath)) {

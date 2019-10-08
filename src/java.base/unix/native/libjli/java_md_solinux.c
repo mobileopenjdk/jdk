@@ -156,6 +156,18 @@
  * Main
  */
 
+#ifdef __ANDROID__
+static char * __java_home = NULL;
+#endif
+
+void SetJavaHome(char *arg) {
+#ifdef __ANDROID__
+  __java_home = arg;
+#else
+  (void)arg;
+#endif
+}
+
 /* Store the name of the executable once computed */
 static char *execname = NULL;
 
@@ -300,6 +312,7 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
     char * jvmtype = NULL;
     int argc = *pargc;
     char **argv = *pargv;
+fprintf(stderr, "CreateExecutionEnv, jrepath at %p and so = %d\n", jrepath, so_jrepath);
 
 #ifdef SETENV_REQUIRED
     jboolean mustsetenv = JNI_FALSE;
@@ -509,21 +522,33 @@ GetJVMPath(const char *jrepath, const char *jvmtype,
 static jboolean
 GetJREPath(char *path, jint pathsize, jboolean speculative)
 {
+fprintf(stderr, "GET JRE PATH for %s at %p and ps = %d\n",path, path, pathsize);
     char libjava[MAXPATHLEN];
     struct stat s;
 
     if (GetApplicationHome(path, pathsize)) {
+fprintf(stderr, "gje1, path = %s with size %d\n", path, pathsize);
         /* Is JRE co-located with the application? */
         JLI_Snprintf(libjava, sizeof(libjava), "%s/lib/" JAVA_DLL, path);
+fprintf(stderr, "try \n%s\n\n", libjava);
         if (access(libjava, F_OK) == 0) {
             JLI_TraceLauncher("JRE path is %s\n", path);
             return JNI_TRUE;
         }
+        /* Is JRE co-located with the application? */
+        JLI_Snprintf(libjava, sizeof(libjava), "%s/" JAVA_DLL, path);
+fprintf(stderr, "try \n%s\n\n", libjava);
+        if (access(libjava, F_OK) == 0) {
+            JLI_TraceLauncher("YES JRE path is %s\n", path);
+            return JNI_TRUE;
+        }
+fprintf(stderr, "gje2\n");
         /* ensure storage for path + /jre + NULL */
         if ((JLI_StrLen(path) + 4  + 1) > (size_t) pathsize) {
             JLI_TraceLauncher("Insufficient space to store JRE path\n");
             return JNI_FALSE;
         }
+fprintf(stderr, "gje3\n");
         /* Does the app ship a private JRE in <apphome>/jre directory? */
         JLI_Snprintf(libjava, sizeof(libjava), "%s/jre/lib/" JAVA_DLL, path);
         if (access(libjava, F_OK) == 0) {
@@ -533,6 +558,7 @@ GetJREPath(char *path, jint pathsize, jboolean speculative)
         }
     }
 
+fprintf(stderr, "gje4\n");
     if (GetApplicationHomeFromDll(path, pathsize)) {
         JLI_Snprintf(libjava, sizeof(libjava), "%s/lib/" JAVA_DLL, path);
         if (stat(libjava, &s) == 0) {
@@ -542,6 +568,7 @@ GetJREPath(char *path, jint pathsize, jboolean speculative)
     }
 
     if (!speculative)
+fprintf(stderr, "gje5\n");
       JLI_ReportErrorMessage(JRE_ERROR8 JAVA_DLL);
     return JNI_FALSE;
 }
@@ -669,13 +696,70 @@ SetExecname(char **argv)
     }
 #elif defined(__linux__)
     {
+#ifndef __ANDROID__
         const char* self = "/proc/self/exe";
         char buf[PATH_MAX+1];
         int len = readlink(self, buf, PATH_MAX);
+fprintf(stderr, "procself = %s\n", buf);
         if (len >= 0) {
             buf[len] = '\0';            /* readlink(2) doesn't NUL terminate */
             exec_path = JLI_StringDup(buf);
         }
+#else
+fprintf(stderr, "SETEXECNAME on Android\n");
+        /* For Android, 'self' would point to /system/bin/app_process
+         * since we are really executing a Dalvik program at this point.
+         * argv[0] points to the Dalvik application name and we set the
+         * path to __java_home.
+         */
+        char buf[PATH_MAX+1];
+        char *p = NULL;
+fprintf(stderr, "argv[0] = %s at %p\n",argv[0], argv[0]);
+        if ((p = JLI_StrRChr(argv[0], '/')) != 0) {
+          /* may be running from command line */
+          p++;
+          if ((JLI_StrLen(p) == 4) && JLI_StrCmp(p, "java") == 0) {
+            /* started as 'java'. Must be command line */
+            JLI_TraceLauncher("SetExecName maybe command line = %s\n", argv[0]);
+            if (*argv[0] != '/') {
+              char *curdir = NULL;
+              /* get absolute path */
+              getcwd(buf, PATH_MAX);
+              curdir = JLI_StringDup(buf);
+              JLI_Snprintf(buf, PATH_MAX, "%s/%s", curdir, argv[0]);
+              JLI_MemFree(curdir);
+            } else {
+              JLI_Snprintf(buf, PATH_MAX, "%s", argv[0]);
+            }
+          } else {
+            /* Not command line, see if __java_home set */
+            if (__java_home != NULL) {
+              JLI_TraceLauncher("SetExecName not java = %s\n", __java_home);
+              JLI_Snprintf(buf, PATH_MAX, "%s/bin/java", __java_home);
+            } else {
+              /* Fake it as best we can or should we punt? */
+              JLI_TraceLauncher("SetExecName fake it = %s\n", argv[0]);
+              // JLI_Snprintf(buf, PATH_MAX, "/data/data/%s/storage/jvm/bin/java", argv[0]);
+              JLI_Snprintf(buf, PATH_MAX, "%s/bin/java", argv[0]);
+            }
+          }
+        } else {
+            /* Not started as 'java', see if __java_home set */
+            if (__java_home != NULL) {
+              JLI_TraceLauncher("SetExecName not command line = %s\n", __java_home);
+              JLI_Snprintf(buf, PATH_MAX, "%s/bin/java", __java_home);
+            } else {
+              /* Fake it as best we can or should we punt? */
+              JLI_TraceLauncher("SetExecName fake it 2 = %s\n", argv[0]);
+              // JLI_Snprintf(buf, PATH_MAX, "/data/data/%s/storage/jvm/bin/java",
+                           // argv[0]);
+              JLI_Snprintf(buf, PATH_MAX, "%s",
+                           argv[0]);
+            }
+        }
+        exec_path = JLI_StringDup(buf);
+fprintf(stderr, "Result, buff = %s\n",buf);
+#endif
     }
 #else /* !__solaris__ && !__linux__ */
     {

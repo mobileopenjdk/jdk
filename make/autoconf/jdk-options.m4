@@ -223,6 +223,9 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JDK_OPTIONS],
   if test "x$OPENJDK_TARGET_OS" = xaix ; then
     INCLUDE_SA=false
   fi
+  if test "x$OPENJDK_TARGET_OS" = xandroid ; then
+    INCLUDE_SA=false
+  fi
   if test "x$OPENJDK_TARGET_CPU" = xs390x ; then
     INCLUDE_SA=false
   fi

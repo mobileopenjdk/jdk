@@ -251,6 +251,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_DETERMINE_TOOLCHAIN_TYPE],
       # default to clang
       DEFAULT_TOOLCHAIN="clang"
     fi
+  elif test "x$OPENJDK_TARGET_OS" = "xandroid"  ; then
+          DEFAULT_TOOLCHAIN="clang"
   else
     # First toolchain type in the list is the default
     DEFAULT_TOOLCHAIN=${VALID_TOOLCHAINS%% *}
@@ -507,7 +509,7 @@ AC_DEFUN([TOOLCHAIN_EXTRACT_COMPILER_VERSION],
     if test $? -ne 0; then
       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the required $TOOLCHAIN_TYPE compiler.])
       AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION_OUTPUT"])
-      AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
+      #AC_MSG_ERROR([A $TOOLCHAIN_TYPE compiler is required. Try setting --with-tools-dir.])
     fi
     # Collapse compiler output into a single line
     COMPILER_VERSION_STRING=`$ECHO $COMPILER_VERSION_OUTPUT`
@@ -533,6 +535,7 @@ AC_DEFUN([TOOLCHAIN_FIND_COMPILER],
 [
   COMPILER_NAME=$2
   SEARCH_LIST="$3"
+    AC_MSG_NOTICE([OOOOOOOOOOOOOOOOOOOOOOOO 1 = $1   and 2 = $2    and 3 = $3])
 
   if test "x[$]$1" != x; then
     # User has supplied compiler name already, always let that override.
@@ -858,7 +861,8 @@ AC_DEFUN_ONCE([TOOLCHAIN_DETECT_TOOLCHAIN_EXTRA],
 
   # objcopy is used for moving debug symbols to separate files when
   # full debug symbols are enabled.
-  if test "x$OPENJDK_TARGET_OS" = xsolaris || test "x$OPENJDK_TARGET_OS" = xlinux; then
+  if test "x$OPENJDK_TARGET_OS" = xsolaris || test "x$OPENJDK_TARGET_OS" = xlinux || \
+      test "x$OPENJDK_TARGET_OS" = xandroid ; then
     BASIC_CHECK_TOOLS(OBJCOPY, [gobjcopy objcopy])
     # Only call fixup if objcopy was found.
     if test -n "$OBJCOPY"; then

@@ -492,6 +492,7 @@ forkChild(ChildStuff *c) {
     return resultPid;
 }
 
+#ifndef __ANDROID__ // spawn_posix is available only in Android 28
 static pid_t
 spawnChild(JNIEnv *env, jobject process, ChildStuff *c, const char *helperpath) {
     pid_t resultPid;
@@ -574,6 +575,7 @@ spawnChild(JNIEnv *env, jobject process, ChildStuff *c, const char *helperpath) 
      * via the statement below */
     return resultPid;
 }
+#endif
 
 /*
  * Start a child process running function childProcess.
@@ -590,7 +592,11 @@ startChild(JNIEnv *env, jobject process, ChildStuff *c, const char *helperpath) 
       case MODE_FORK:
         return forkChild(c);
       case MODE_POSIX_SPAWN:
+#ifndef __ANDROID__
         return spawnChild(env, process, c, helperpath);
+#else
+fprintf(stderr, "Whoops, startChild will not succeed\n");
+#endif
       default:
         return -1;
     }

@@ -25,6 +25,12 @@
 #ifndef OS_LINUX_GLOBALS_LINUX_HPP
 #define OS_LINUX_GLOBALS_LINUX_HPP
 
+#ifndef __ANDROID__
+#define SUPPORTS_SHM 1
+#else
+#define SUPPORTS_SHM 0
+#endif
+
 //
 // Defines Linux specific flags. They are not available on other platforms.
 //
